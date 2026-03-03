@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      TF_TOKEN_app_terraform_io: ${{ secrets.APP_REPO_PAT }}
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
 
     steps:
       - name: checkout code
@@ -47,7 +47,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: peter-evans/repository-dispatch@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.APP_REPO_PAT }}
           repository: bn-ritesh-chavan/cicd-app
-          event-type: deploy-app
+          event-type: infra-updated
           
