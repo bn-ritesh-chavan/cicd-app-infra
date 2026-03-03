@@ -42,3 +42,12 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve
+
+      - name: Terraform App Deployment
+        if: github.ref == 'refs/heads/main'
+        uses: peter-evans/repository-dispatch@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN}}
+          repository: bn-ritesh-chavan/cicd-app
+          event-type: deploy-app
+          
