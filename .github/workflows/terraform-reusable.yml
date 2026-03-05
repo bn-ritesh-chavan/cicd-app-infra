@@ -54,24 +54,9 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           content=$(cat tfplan.txt)
-          # Escape newlines for GitHub output
           echo "plan_output<<EOF" >> $GITHUB_OUTPUT
           echo "$content" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Format Plan Output
-        id: format_plan
-        if: github.event_name == 'pull_request'
-        run: |
-          # Extract key information from plan
-          ADDS=$(grep -c "# .*will be created" tfplan.txt || echo "0")
-          CHANGES=$(grep -c "# .*will be updated" tfplan.txt || echo "0")
-          DESTROYS=$(grep -c "# .*will be destroyed" tfplan.txt || echo "0")
-          
-          echo "adds=$ADDS" >> $GITHUB_OUTPUT
-          echo "changes=$CHANGES" >> $GITHUB_OUTPUT
-          echo "destroys=$DESTROYS" >> $GITHUB_OUTPUT
-
 
       - name: Terraform Plan Comment
         if: github.event_name == 'pull_request'
