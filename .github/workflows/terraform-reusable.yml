@@ -44,13 +44,56 @@ jobs:
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -no-color | tee tfplan.out
+        run: |
+          terraform plan -no-color > tfplan.txt 2>&1
+          echo "plan_exit_code=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Read Plan Output
+        id: read_plan
+        if: github.event_name == 'pull_request'
+        run: |
+          content=$(cat tfplan.txt)
+          # Escape newlines for GitHub output
+          echo "plan_output<<EOF" >> $GITHUB_OUTPUT
+          echo "$content" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Format Plan Output
+        id: format_plan
+        if: github.event_name == 'pull_request'
+        run: |
+          # Extract key information from plan
+          ADDS=$(grep -c "# .*will be created" tfplan.txt || echo "0")
+          CHANGES=$(grep -c "# .*will be updated" tfplan.txt || echo "0")
+          DESTROYS=$(grep -c "# .*will be destroyed" tfplan.txt || echo "0")
+          
+          echo "adds=$ADDS" >> $GITHUB_OUTPUT
+          echo "changes=$CHANGES" >> $GITHUB_OUTPUT
+          echo "destroys=$DESTROYS" >> $GITHUB_OUTPUT
+
 
       - name: Terraform Plan Comment
         if: github.event_name == 'pull_request'
         uses: mshick/add-pr-comment@v2
         with:
-          message-path: tfplan.out
+         message: |
+            ## 📋 Terraform Plan Summary
+            
+            | Action | Count |
+            |--------|-------|
+            | ✅ To Add | ${{ steps.format_plan.outputs.adds }} |
+            | 🔄 To Change | ${{ steps.format_plan.outputs.changes }} |
+            | ❌ To Destroy | ${{ steps.format_plan.outputs.destroys }} |
+            
+            <details>
+            <summary><b>📝 Full Plan Output</b></summary>
+            
+            ```terraform
+            ${{ steps.read_plan.outputs.plan_output }}
+            ```
+            
+            </details>
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
