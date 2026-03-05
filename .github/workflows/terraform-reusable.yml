@@ -63,13 +63,7 @@ jobs:
         uses: mshick/add-pr-comment@v2
         with:
          message: |
-            ## 📋 Terraform Plan Summary
-            
-            | Action | Count |
-            |--------|-------|
-            | ✅ To Add | ${{ steps.format_plan.outputs.adds }} |
-            | 🔄 To Change | ${{ steps.format_plan.outputs.changes }} |
-            | ❌ To Destroy | ${{ steps.format_plan.outputs.destroys }} |
+            ## Terraform Plan Summary
             
             <details>
             <summary><b>📝 Full Plan Output</b></summary>
