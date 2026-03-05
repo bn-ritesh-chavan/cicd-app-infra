@@ -1,4 +1,4 @@
-name: Terraform CI/CD
+name: Terraform Reusable Workflow
 
 on:
   workflow_call:
@@ -6,7 +6,12 @@ on:
       trigger_repo:
         required: false
         type: string
-
+    secrets:
+      TF_API_TOKEN:
+        required: true
+      APP_REPO_PAT:
+        required: true
+        
 permissions:
   contents: read
   pull-requests: write
