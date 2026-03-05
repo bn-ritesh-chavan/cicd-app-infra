@@ -44,8 +44,12 @@ jobs:
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -no-color | tee tfplan.out
+        run: terraform plan -out=tfplan
 
+      - name: Terraform Show
+        if: github.event_name == 'pull_request'
+        run: terraform show -no-color tfplan > tfplan.out
+        
       - name: Terraform Plan Comment
         if: github.event_name == 'pull_request'
         uses: borchero/terraform-plan-comment@v2
